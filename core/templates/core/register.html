@@ -1,0 +1,13 @@
+<div style="margin:25px">
+
+    <h2>Реєстрація нового користувача</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Зареєструватися</button>
+    </form>
+
+    <p>Вже маєте акаунт? <a href=/login/>Увійти</a></p>
+
+
+</div>

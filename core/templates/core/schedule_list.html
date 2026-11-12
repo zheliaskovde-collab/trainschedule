@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Розклад маршрутів та пошук</title>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 30px;">
+
+    <h1>Пошук та розклад маршрутів потягів</h1>
+    <a href="{% url 'home' %}"> На головну</a>
+    <hr>
+
+    <!-- Форма пошуку -->
+    <form method="GET" action="{% url 'schedule_list' %}" style="background: #f9f9f9; padding: 20px;">
+        <h3>Фільтр маршрутів</h3>
+        
+        <label for="from_station">Звідки:</label>
+        <select name="from_station" id="from_station" style="margin-right: 15px; padding: 5px;">
+            <option value="">-- Оберіть станцію --</option>
+            {% for station in stations_all %}
+                <option value="{{ station.id }}" 
+                    {% if request.GET.from_station == station.id|stringformat:"s" %}
+                        selected
+                    {% endif %}>
+                        {{ station.name }} ({{ station.city }})
+                </option>
+            {% endfor %}
+        </select>
+
+        <label for="to_station">Куди:</label>
+        <select name="to_station" id="to_station" style="margin-right: 15px; padding: 5px;">
+            <option value="">-- Оберіть станцію --</option>
+            {% for station in stations_all %}
+                <option value="{{ station.id }}" {% if request.GET.to_station == station.id|stringformat:"s" %}selected{% endif %}>
+                    {{ station.name }} ({{ station.city }})
+                </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit" style="padding: 6px 15px; background-color: #007BFF; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            Знайти
+        </button>
+        
+        {% if request.GET.from_station and request.GET.to_station %}
+            <a href="{% url 'schedule_list' %}" style="margin-left: 10px; text-decoration: none; color: red;">Скинути фільтр</a>
+        {% endif %}
+    </form>
+
+    <hr>
+
+    <!-- Список знайдених маршрутів -->
+    <h2>Результати пошуку</h2>
+    <ul>
+        {% for route in routes %}
+            <li>
+                <b>Потяг №{{ route.train.number }}</b> — Ціна: {{ route.price }} грн
+                <br>
+                <small>Всі зупинки на маршруті:</small>
+                <ol>
+                    {% for point in route.points.all %}
+                        <li style="margin:5px"> {{ point.station.name }} (Приб: {{ point.arrival_time|default:"-" }}, Відпр: {{ point.departure_time|default:"-" }})</li>
+                    {% endfor %}
+                </ol>
+            </li>
+            <br>
+        {% empty %}
+            <p>За вашим запитом не знайдено жодного маршруту.</p>
+        {% endfor %}
+    </ul>
+
+</body>
+</html>
